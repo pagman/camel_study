@@ -51,12 +51,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 onChanged: (value){
                   int rounds = 0;
                   int breaks = 0;
-                  int firstHard = 0;
+                  int firstHard = 130;
                   int sessionTime = int.parse(value);
                   int sessionTime1 = int.parse(value);
 
                   while(sessionTime > 30){
-                    
+                    if(sessionTime/130>0){
+                      firstHard  = 90;
+                      rounds = rounds + 2;
+                      breaks = breaks + 2;
+                      sessionTime = sessionTime -130;
+                    }
 
                   }
                   // else{
