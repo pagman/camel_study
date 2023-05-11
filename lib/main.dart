@@ -49,8 +49,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            Text(
+              'Timer Goes Here!',
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            SizedBox(height: 20,),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextFormField(
