@@ -36,6 +36,8 @@ final _formKey = GlobalKey<FormState>();
 
 class _MyHomePageState extends State<MyHomePage> {
   int _session = 0;
+  int _rounds = 0;
+  int _breaks = 0;
 
 
   @override
@@ -67,17 +69,38 @@ class _MyHomePageState extends State<MyHomePage> {
               onChanged: (value){
                 int rounds = 0;
                 int breaks = 0;
+                int easy_break = 5;
+                int hard_break = 10;
                 int study = 0;
-                setState(() {
-                  _session = int.parse(value);
-                });
+                int hard = 90;
+                int easy = 25;
+                int sessionTime = int.parse(value);
+                if (sessionTime >= 130){
+                  print("its Valid");
+                  while(sessionTime>=25){
+                    sessionTime = sessionTime - hard - hard_break - easy - easy_break;
+                    rounds ++;
+                    breaks =  breaks + 2;
+                  }
+                  setState(() {
+                    _rounds = rounds;
+                    _breaks = breaks;
+                  });
+                }
+                else{
+                  setState(() {
+                    _rounds = 0;
+                    _breaks = 0;
+                  });
+
+                }
 
               },
             ),
     ),
             Text(
-              '$_session',
-              style: Theme.of(context).textTheme.headlineMedium,
+              (_rounds!=0)?'You have $_rounds rounds and $_breaks breaks ':"",
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
           ],
         ),
