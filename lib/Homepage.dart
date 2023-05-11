@@ -14,7 +14,8 @@ final _formKey = GlobalKey<FormState>();
 class _MyHomePageState extends State<MyHomePage> {
   int _firstHard = 0;
   int _rounds = 0;
-  int _breaks = 0;
+  int _timeLeft = 0;
+  List<List<int>> scheduleList = [[]];
 
 
   @override
@@ -32,7 +33,9 @@ class _MyHomePageState extends State<MyHomePage> {
               'Timer Goes Here!',
               style: Theme.of(context).textTheme.headlineLarge,
             ),
-            const SizedBox(height: 20,),
+            const SizedBox(
+              height: 20,
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
               child: TextFormField(
@@ -48,37 +51,49 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                   return null;
                 },
-                onChanged: (value){
+                onChanged: (value) {
                   int rounds = 0;
-                  int breaks = 0;
-                  int firstHard = 130;
+                  int flag = 0;
+                  int hard = 130;
                   int sessionTime = int.parse(value);
-                  int sessionTime1 = int.parse(value);
+                  scheduleList.clear();
+                  while (sessionTime >= 90) {
+                    if (sessionTime - hard >= 0) {
+                      print(hard);
+                      sessionTime = sessionTime - hard;
+                      rounds++;
+                      setState(() {
+                        scheduleList.add([hard-40,10,25,5]);
+                        _rounds = rounds;
+                      });
 
-                  while(sessionTime > 30){
-                    if(sessionTime/130>0){
-                      firstHard  = 90;
-                      rounds = rounds + 2;
-                      breaks = breaks + 2;
-                      sessionTime = sessionTime -130;
+                    }
+                    print("Session time left: $sessionTime");
+                    if (hard > 90) {
+                      hard = hard - 10;
+                      print(hard);
                     }
 
                   }
-                  // else{
-                  //   setState(() {
-                  //     _firstHard = 0;
-                  //     _rounds = 0;
-                  //     _breaks = 0;
-                  //   });
-                  // }
-
+                  print(scheduleList);
                 },
               ),
             ),
-            Text(
-              (_rounds!=0)?'You have $_rounds rounds and $_breaks breaks and first hard $_firstHard':"",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+        Visibility(
+          visible:(_rounds>0)?true:false,
+          child: Expanded(
+            child: ListView.builder(
+                itemCount: scheduleList.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                      child: ListTile(
+                          title: Text("${scheduleList[index][0]} "+ "${scheduleList[index][1]} "+"${scheduleList[index][2]} "+"${scheduleList[index][3]}"),
+                          subtitle: Text("Hard Break Easy Break"),
+                          trailing: Icon(Icons.timer)));
+                }),
+          ),
+        ),
+
           ],
         ),
       ),
