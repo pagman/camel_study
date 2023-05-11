@@ -53,168 +53,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   int breaks = 0;
                   int firstHard = 0;
                   int sessionTime = int.parse(value);
+                  int sessionTime1 = int.parse(value);
 
-                  if (sessionTime >= 130){
-                    print("its Valid");
-                    while(sessionTime>=130){ //130 120 110 100 90
-                      if(rounds ==0 && sessionTime >= 130) {
-                        print("mpike");
-                        sessionTime =
-                            sessionTime - 90 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                        firstHard = 90;
-                      }
-                      if(rounds ==1 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 80 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                      if(rounds ==2 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 70 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                      if(rounds ==3 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 60 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                      if(rounds >=4 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 50 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                    }
-                    print(sessionTime);
-                    print(firstHard);
-                    print(rounds);
-                    setState(() {
-                      _rounds = rounds;
-                      _breaks = breaks;
-                      _firstHard = firstHard;
-                    });
-                  }
-                  else if (sessionTime >= 120 && sessionTime < 130){
-                    print("its Valid");
-                    while(sessionTime>=120){ //130 120 110 100 90
-                      if(rounds ==0 && sessionTime >= 120) {
-                        sessionTime =
-                            sessionTime - 80 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                        firstHard = 80;
-                      }
-                      if(rounds ==1 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 70 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                      if(rounds ==2 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 60 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                      if(rounds >=3 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 50 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                    }
-                    print(sessionTime);
-                    setState(() {
-                      _rounds = rounds;
-                      _breaks = breaks;
-                      _firstHard = firstHard;
-                    });
-                  }
-                  else if (sessionTime >= 110 && sessionTime < 120){
-                    print("its Valid");
-                    while(sessionTime>=110){ //130 120 110 100 90
-                      if(rounds ==0 && sessionTime >= 110) {
-                        sessionTime =
-                            sessionTime - 70 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                        firstHard = 70;
-                      }
-                      if(rounds ==1 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 60 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                      if(rounds >=2 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 50 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                    }
-                    print(sessionTime);
-                    setState(() {
-                      _rounds = rounds;
-                      _breaks = breaks;
-                      _firstHard = firstHard;
-                    });
-                  }
-                  else if (sessionTime >= 100 && sessionTime < 110){
-                    print("its Valid");
-                    while(sessionTime>=100){ //130 120 110 100 90
-                      if(rounds ==0 && sessionTime >= 100) {
-                        sessionTime =
-                            sessionTime - 60 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                        firstHard = 60;
-                      }
-                      if(rounds >=1 && sessionTime >= 130) {
-                        sessionTime =
-                            sessionTime - 50 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                      }
-                    }
-                    print(sessionTime);
-                    setState(() {
-                      _rounds = rounds;
-                      _breaks = breaks;
-                      _firstHard = firstHard;
-                    });
-                  }
-                  else if (sessionTime >= 90 && sessionTime < 100){
-                    print("its Valid");
-                    while(sessionTime>=90){ //130 120 110 100 90
-                      if(rounds >=0 && sessionTime >= 90) {
-                        sessionTime =
-                            sessionTime - 50 - 10 - 25 - 5;
-                        rounds++;
-                        breaks = breaks + 2;
-                        firstHard = 50;
-                      }
+                  while(sessionTime > 30){
+                    
 
-                    }
-                    print(sessionTime);
-                    setState(() {
-                      _rounds = rounds;
-                      _breaks = breaks;
-                      _firstHard = firstHard;
-                    });
                   }
-                  else{
-                    setState(() {
-                      _firstHard = 0;
-                      _rounds = 0;
-                      _breaks = 0;
-                    });
-                  }
+                  // else{
+                  //   setState(() {
+                  //     _firstHard = 0;
+                  //     _rounds = 0;
+                  //     _breaks = 0;
+                  //   });
+                  // }
 
                 },
               ),
