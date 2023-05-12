@@ -236,7 +236,7 @@ class _MyHomePageState extends State<MyHomePage> {
             _rounds = rounds;
           });
         }
-        else if(sessionTime<25){
+        else if(sessionTime<25&&sessionTime>0){
           rounds++;
           setState(() {
             scheduleList.add([sessionTime]);
