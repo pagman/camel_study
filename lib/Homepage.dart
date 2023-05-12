@@ -28,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _value = 300;
   String _status = 'idle';
   Color _statusColor = Colors.amber;
-  TimeOfDay _time = TimeOfDay(hour: 1, minute: 30);
+  TimeOfDay _time = TimeOfDay(hour: 7, minute: 24);
 
   @override
   void initState() {
@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _startTimer() {
     for (int i = 0; i <= scheduleList.length - 1; i++) {
-      for (int j = 0; j <= 3; j++) {
+      for (int j = 0; j <= scheduleList[i].length - 1; j++) {
         alarms.add(scheduleList[i][j].toString());
       }
     }
@@ -211,14 +211,42 @@ class _MyHomePageState extends State<MyHomePage> {
             });
 
           }
-          print("Session time left: $sessionTime");
+          //print("Session time left: $sessionTime");
           if (hard > 90) {
             hard = hard - 10;
             print(hard);
           }
 
         }
-        print(scheduleList);
+        while(sessionTime<90&&sessionTime>=30){
+          sessionTime = sessionTime-30;
+          rounds++;
+          setState(() {
+            scheduleList.add([25,5]);
+            //scheduleList.add([0,0,0,0]);
+            _rounds = rounds;
+          });
+        }
+        if(sessionTime>=25&&sessionTime<30){
+          sessionTime = sessionTime-25;
+          rounds++;
+          setState(() {
+            scheduleList.add([25]);
+            //scheduleList.add([0,0,0,0]);
+            _rounds = rounds;
+          });
+        }
+        else if(sessionTime<25){
+          rounds++;
+          setState(() {
+            scheduleList.add([sessionTime]);
+            //scheduleList.add([0,0,0,0]);
+            _rounds = rounds;
+          });
+          sessionTime=0;
+        }
+        print("Session time left: $sessionTime");
+        //print(scheduleList);
       });
     }
   }
@@ -234,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Container(
               width: double.infinity,
@@ -244,6 +272,18 @@ class _MyHomePageState extends State<MyHomePage> {
                   '${_minutes.toString().padLeft(2, '0')}:${_seconds.toString().padLeft(2, '0')}',
                   style: const TextStyle(
                       fontSize: 60, fontWeight: FontWeight.bold,color: Color(0xffA0D8B3)),
+
+                ),
+              ),
+            ),
+            Container(
+              width: double.infinity,
+              height: 50,
+              child: Center(
+                child: Text(
+                  (alarms.length/2==0)?'Break':"Study",
+                  style: const TextStyle(
+                      fontSize: 20,color: Color(0xffA0D8B3)),
 
                 ),
               ),
@@ -431,8 +471,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 itemBuilder: (context, index) {
                   return Card(
                       child: ListTile(
-                          title: Text("${scheduleList[index][0]} "+ "${scheduleList[index][1]} "+"${scheduleList[index][2]} "+"${scheduleList[index][3]}"),
-                          subtitle: Text("Hard Break Easy Break"),
+                          title: Text(scheduleList[index].join(" ")),
+                          subtitle: Text((scheduleList[index].length==4)?"Hard Break Easy Break":(scheduleList[index].length==2)?"Easy Break":"Easy"),
                           trailing: Icon(Icons.timer)));
                 }),
           ),
