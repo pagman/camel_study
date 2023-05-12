@@ -229,7 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       key: _formKey,
       appBar: AppBar(
-        backgroundColor: Color(0xff83764F),
+        backgroundColor: Color(0xffA0D8B3),
         title: Text(widget.title),
       ),
       body: Center(
