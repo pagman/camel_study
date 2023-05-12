@@ -12,7 +12,6 @@ class MyHomePage extends StatefulWidget {
 final _formKey = GlobalKey<FormState>();
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _firstHard = 0;
   int _rounds = 0;
   int _timeLeft = 0;
   List<List<int>> scheduleList = [[]];
