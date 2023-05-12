@@ -24,6 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isRunning = false;
   bool _isPause = false;
   bool _runOut = false;
+  bool _visibleTime = true;
   Timer? _timer;
   int _value = 300;
   String _status = 'idle';
@@ -75,6 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     alarms.removeAt(0);
 
     setState(() {
+      _visibleTime=false;
       _isRunning = true;
     });
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -104,6 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   void _resumeTimer() {
     setState(() {
+      _visibleTime=false;
       _isRunning = true;
     });
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -146,6 +149,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // Cancel the timer
   void _cancelTimer() {
     setState(() {
+      _visibleTime=true;
       _hours = 0;
       _minutes = 0;
       _seconds = 0;
@@ -303,6 +307,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 // The text on the button changes based on the state (_isRunning)
                 ElevatedButton(
                   onPressed: () {
+                    setState(() {
+                      _visibleTime=false;
+                    });
                     if (_isRunning) {
                       _pauseTimer();
                     }
@@ -341,12 +348,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Center(
               child:
-              ElevatedButton(
-                onPressed: _selectTime,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xff83764F),
-                    fixedSize: const Size(150, 40)),
-                child: const Text('Select time'),
+              Visibility(
+                visible: _visibleTime,
+                child: ElevatedButton(
+                  onPressed: _selectTime,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xff83764F),
+                      fixedSize: const Size(150, 40)),
+                  child: const Text('Select time'),
+                ),
               ),
             ),
 
