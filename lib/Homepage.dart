@@ -159,15 +159,33 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _selectTime() async {
     final TimeOfDay? newTime = await showTimePicker(
-      builder: (context, childWidget) {
-        return MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              // Using 24-Hour format
-                alwaysUse24HourFormat: true),
-            // If you want 12-Hour format, just change alwaysUse24HourFormat to false or remove all the builder argument
-            child: childWidget!);
-      },
       context: context,
+      builder: (context, childWidget) {
+
+        return
+          MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                // Using 24-Hour format
+                  alwaysUse24HourFormat: true),
+              // If you want 12-Hour format, just change alwaysUse24HourFormat to false or remove all the builder argument
+              child:
+          Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: Color(0xffA0D8B3), // <-- SEE HERE
+              onPrimary: Color(0xffA2A378), // <-- SEE HERE
+              onSurface: Color(0xff83764F), // <-- SEE HERE
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                primary: Color(0xffA2A378), // button text color
+              ),
+            ),
+          ),
+
+          child: childWidget!,
+        ));
+      },
       initialTime: _time,
     );
     if (newTime != null) {
@@ -211,6 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       key: _formKey,
       appBar: AppBar(
+        backgroundColor: Color(0xff83764F),
         title: Text(widget.title),
       ),
       body: Center(
@@ -224,14 +243,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Text(
                   '${_minutes.toString().padLeft(2, '0')}:${_seconds.toString().padLeft(2, '0')}',
                   style: const TextStyle(
-                      fontSize: 60, fontWeight: FontWeight.bold),
+                      fontSize: 60, fontWeight: FontWeight.bold,color: Color(0xffA0D8B3)),
 
                 ),
               ),
             ),
             Center(
               child:
-              Text(alarms.join(" ")),
+              Text(alarms.join(" "),
+                  style: TextStyle(color: Color(0xffA0D8B3)),),
             ),
             // The 3 sliders to set hours, minutes and seconds
 
@@ -264,14 +284,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     }
                   },
                   style:
-                  ElevatedButton.styleFrom(fixedSize: const Size(150, 40)),
+                  ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xffA0D8B3),
+                      fixedSize: const Size(150, 40)),
                   child: _isRunning? const Text('Pause') :(!_isRunning && _isPause)? const Text('Resume'):const Text('Start'),
                 ),
                 // The cancel button
                 ElevatedButton(
                   onPressed: _cancelTimer,
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
+                      backgroundColor: Color(0xffA2A378),
                       fixedSize: const Size(150, 40)),
                   child: const Text('Cancel'),
                 ),
@@ -282,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ElevatedButton(
                 onPressed: _selectTime,
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: Color(0xff83764F),
                     fixedSize: const Size(150, 40)),
                 child: const Text('Select time'),
               ),

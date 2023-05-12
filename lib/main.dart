@@ -14,10 +14,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Camel Study technique',
-      theme: ThemeData(
-
-        primarySwatch: Colors.blue,
-      ),
       home:  MyHomePage(title: 'Camel study by Vanya'),
     );
   }
