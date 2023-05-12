@@ -23,6 +23,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late SharedPreferences sharedPreference;
   bool _isRunning = false;
   bool _isPause = false;
+  bool _runOut = false;
   Timer? _timer;
 
   @override
@@ -36,6 +37,24 @@ class _MyHomePageState extends State<MyHomePage> {
     sharedPreference = await SharedPreferences.getInstance();
     List<String> listString = sharedPreference.getStringList('list')??[];
     print("loaded");
+    setState(() {
+      print(listString);
+      alarms = listString;
+      String minutes = alarms[0].split('@')[0];
+      DateTime timerStarted = DateTime.parse(alarms[0].split('@')[1]);
+      print(timerStarted);
+      print(DateTime.now());
+      int differenceIntime = DateTime.now().difference(timerStarted).inMinutes;
+      print(differenceIntime);
+      if(int.parse(minutes)>=differenceIntime){
+        _minutes = int.parse(minutes)-differenceIntime;
+      }
+      else{
+        _minutes = 0;
+      }
+      _resumeTimer();
+      alarms.removeAt(0);
+    });
   }
 
   void _startTimer() {
@@ -45,8 +64,9 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     }
 
-    sharedPreference.setStringList("list",alarms);
     _minutes = int.parse(alarms.first);
+    alarms[0] = alarms[0]+'@'+DateTime.now().toString();
+    sharedPreference.setStringList("list",alarms);
     _seconds = 0;
     alarms.removeAt(0);
 
@@ -67,8 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
               _minutes = 59;
               _seconds = 59;
             } else {
-              print("run out");
+              print("run out1");
               _isRunning = false;
+              _isPause = true;
+              _runOut = true;
               _timer?.cancel();
             }
           }
@@ -94,8 +116,10 @@ class _MyHomePageState extends State<MyHomePage> {
               _minutes = 59;
               _seconds = 59;
             } else {
-              print("run out");
+              print("run out2");
               _isRunning = false;
+              _isPause = true;
+              _runOut = true;
               _timer?.cancel();
             }
           }
@@ -123,6 +147,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _seconds = 0;
       _isRunning = false;
       _isPause = false;
+      _isPause = false;
+      _runOut = false;
     });
     _timer?.cancel();
   }
@@ -168,7 +194,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     if (_isRunning) {
                       _pauseTimer();
                     }
-                    else if(_isPause){
+                    else if(_isPause && !_runOut){
+                      _resumeTimer();
+                    }
+                    else if(_runOut && _runOut){
+                      print("on resume run out button");
+                      alarms.removeAt(0);
+                      setState(() {
+                        _minutes = int.parse(alarms[0]);
+                      });
+                      _runOut = false;
                       _resumeTimer();
                     }
                       else {
@@ -218,6 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       rounds++;
                       setState(() {
                         scheduleList.add([hard-40,10,25,5]);
+                        //scheduleList.add([0,0,0,0]);
                         _rounds = rounds;
                       });
 
