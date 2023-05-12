@@ -25,6 +25,9 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isPause = false;
   bool _runOut = false;
   Timer? _timer;
+  int _value = 300;
+  String _status = 'idle';
+  Color _statusColor = Colors.amber;
 
   @override
   void initState() {
@@ -225,51 +228,119 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-              child: TextFormField(
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Enter session time',
-                ),
-                // The validator receives the text that the user has entered.
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  int rounds = 0;
-                  int flag = 0;
-                  int hard = 130;
-                  int sessionTime = int.parse(value);
-                  scheduleList.clear();
-                  while (sessionTime >= 90) {
-                    if (sessionTime - hard >= 0) {
-                      print(hard);
-                      sessionTime = sessionTime - hard;
-                      rounds++;
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SliderTheme(
+                  data: SliderTheme.of(context).copyWith(
+                    trackHeight: 10.0,
+                    trackShape: RoundedRectSliderTrackShape(),
+                    activeTrackColor: Colors.purple.shade800,
+                    inactiveTrackColor: Colors.purple.shade100,
+                    thumbShape: RoundSliderThumbShape(
+                      enabledThumbRadius: 14.0,
+                      pressedElevation: 8.0,
+                    ),
+                    thumbColor: Colors.pinkAccent,
+                    overlayColor: Colors.pink.withOpacity(0.2),
+                    overlayShape: RoundSliderOverlayShape(overlayRadius: 32.0),
+                    tickMarkShape: RoundSliderTickMarkShape(),
+                    activeTickMarkColor: Colors.pinkAccent,
+                    inactiveTickMarkColor: Colors.white,
+                    valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+                    valueIndicatorColor: Colors.black,
+                    valueIndicatorTextStyle: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                  child: Slider(
+                    min: 90,
+                    max: 1000,
+                    value: _value.toDouble(),
+                    divisions: 910,
+                    label: '${_value.round()}',
+                    onChanged: (value) {
                       setState(() {
-                        scheduleList.add([hard-40,10,25,5]);
-                        //scheduleList.add([0,0,0,0]);
-                        _rounds = rounds;
+                        _value = value.round();
+                        //print(_value);
+                        int rounds = 0;
+                        int flag = 0;
+                        int hard = 130;
+                        int sessionTime = value.round();
+                        scheduleList.clear();
+                        while (sessionTime >= 90) {
+                          if (sessionTime - hard >= 0) {
+                            print(hard);
+                            sessionTime = sessionTime - hard;
+                            rounds++;
+                            setState(() {
+                              scheduleList.add([hard-40,10,25,5]);
+                              //scheduleList.add([0,0,0,0]);
+                              _rounds = rounds;
+                            });
+
+                          }
+                          print("Session time left: $sessionTime");
+                          if (hard > 90) {
+                            hard = hard - 10;
+                            print(hard);
+                          }
+
+                        }
+                        print(scheduleList);
+
                       });
-
-                    }
-                    print("Session time left: $sessionTime");
-                    if (hard > 90) {
-                      hard = hard - 10;
-                      print(hard);
-                    }
-
-                  }
-                  print(scheduleList);
-
-                },
-              ),
+                    },
+                  ),
+                )
+              ],
             ),
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            //   child: TextFormField(
+            //     keyboardType: TextInputType.number,
+            //     decoration: const InputDecoration(
+            //       border: OutlineInputBorder(),
+            //       hintText: 'Enter session time',
+            //     ),
+            //     // The validator receives the text that the user has entered.
+            //     validator: (value) {
+            //       if (value == null || value.isEmpty) {
+            //         return 'Please enter some text';
+            //       }
+            //       return null;
+            //     },
+            //     onChanged: (value) {
+            //       int rounds = 0;
+            //       int flag = 0;
+            //       int hard = 130;
+            //       int sessionTime = int.parse(value);
+            //       scheduleList.clear();
+            //       while (sessionTime >= 90) {
+            //         if (sessionTime - hard >= 0) {
+            //           print(hard);
+            //           sessionTime = sessionTime - hard;
+            //           rounds++;
+            //           setState(() {
+            //             scheduleList.add([hard-40,10,25,5]);
+            //             //scheduleList.add([0,0,0,0]);
+            //             _rounds = rounds;
+            //           });
+            //
+            //         }
+            //         print("Session time left: $sessionTime");
+            //         if (hard > 90) {
+            //           hard = hard - 10;
+            //           print(hard);
+            //         }
+            //
+            //       }
+            //       print(scheduleList);
+            //
+            //     },
+            //   ),
+            // ),
         Visibility(
           visible:(_rounds>0)?true:false,
           child: Expanded(
