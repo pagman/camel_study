@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _value = 300;
   String _status = 'idle';
   Color _statusColor = Colors.amber;
-  TimeOfDay _time = TimeOfDay(hour: 13, minute: 30);
+  TimeOfDay _time = TimeOfDay(hour: 2, minute: 30);
 
   @override
   void initState() {
