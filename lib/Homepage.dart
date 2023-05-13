@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _value = 300;
   String _status = 'idle';
   Color _statusColor = Colors.amber;
-  TimeOfDay _time = TimeOfDay(hour: 2, minute: 30);
+  TimeOfDay _time = TimeOfDay(hour: 3, minute: 10);
 
   @override
   void initState() {
@@ -237,6 +237,13 @@ class _MyHomePageState extends State<MyHomePage> {
           if (hard < 130 && flag==0) {
             hard = hard + 10;
             print(hard);
+            sessionTime = sessionTime - hard;
+            rounds++;
+            setState(() {
+              scheduleList.add([hard-40,10,25,5]);
+              //scheduleList.add([0,0,0,0]);
+              _rounds = rounds;
+            });
           }
           else if (hard == 130){
             hard = 90;
