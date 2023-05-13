@@ -53,18 +53,19 @@ class _MyHomePageState extends State<MyHomePage> {
       print(differenceIntime);
       if(int.parse(minutes)>=differenceIntime){
         _minutes = int.parse(minutes)-differenceIntime;
+        if(alarms[0].split('@')[2]=='running') {
+          _resumeTimer();
+          //alarms.removeAt(0);
+        }
+        else if(alarms[0].split('@')[2]=='pause'){
+          _pauseTimer();
+          //alarms.removeAt(0);
+        }
       }
       else{
         _minutes = 0;
       }
-      if(alarms[0].split('@')[2]=='running') {
-        _resumeTimer();
-        alarms.removeAt(0);
-      }
-      else if(alarms[0].split('@')[2]=='pause'){
-        _pauseTimer();
-        //alarms.removeAt(0);
-      }
+
     });
   }
 
