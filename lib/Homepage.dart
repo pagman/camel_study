@@ -153,9 +153,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if(alarms[0].contains('@')){
       alarms.removeAt(0);
     }
-    // if(alarms[0].contains('@')){
-    //   alarms.removeAt(0);
-    // }
+
 
 
     setState(() {
