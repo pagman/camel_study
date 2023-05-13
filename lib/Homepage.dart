@@ -78,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     _minutes = int.parse(alarms.first);
-    alarms[0] = alarms[0]+'@'+DateTime.now().toString()+'@running';
+    alarms.insert(0, alarms[0]+'@'+DateTime.now().toString()+'@running');
     sharedPreference.setStringList("list",alarms);
     _seconds = 0;
     setState(() {
