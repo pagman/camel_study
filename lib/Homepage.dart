@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _value = 300;
   String _status = 'idle';
   Color _statusColor = Colors.amber;
-  TimeOfDay _time = TimeOfDay(hour: 1, minute: 30);
+  TimeOfDay _time = TimeOfDay(hour: 13, minute: 30);
 
   @override
   void initState() {
@@ -57,8 +57,14 @@ class _MyHomePageState extends State<MyHomePage> {
       else{
         _minutes = 0;
       }
-      _resumeTimer();
-      alarms.removeAt(0);
+      if(alarms[0].split('@')[2]=='running') {
+        _resumeTimer();
+        alarms.removeAt(0);
+      }
+      else if(alarms[0].split('@')[2]=='pause'){
+        _pauseTimer();
+        //alarms.removeAt(0);
+      }
     });
   }
 
@@ -70,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     _minutes = int.parse(alarms.first);
-    alarms[0] = alarms[0]+'@'+DateTime.now().toString();
+    alarms[0] = alarms[0]+'@'+DateTime.now().toString()+'@running';
     sharedPreference.setStringList("list",alarms);
     _seconds = 0;
     alarms.removeAt(0);
@@ -138,6 +144,20 @@ class _MyHomePageState extends State<MyHomePage> {
   // This function will be called when the user presses the pause button
   // Pause the timer
   void _pauseTimer() {
+    while(alarms[0].contains('@')){
+      alarms.removeAt(0);
+      //alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@pause');
+    }
+    alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@pause');
+    sharedPreference.setStringList("list",alarms);
+    if(alarms[0].contains('@')){
+      alarms.removeAt(0);
+    }
+    // if(alarms[0].contains('@')){
+    //   alarms.removeAt(0);
+    // }
+
+
     setState(() {
       _isRunning = false;
       _isPause = true;
@@ -200,10 +220,10 @@ class _MyHomePageState extends State<MyHomePage> {
         //print(_value);
         int rounds = 0;
         int flag = 0;
-        int hard = 130;
+        int hard = 90;
         int sessionTime = newTime.hour*60+newTime.minute%60;
         scheduleList.clear();
-        while (sessionTime >= 90) {
+        while (sessionTime >= 130) {
           if (sessionTime - hard >= 0) {
             print(hard);
             sessionTime = sessionTime - hard;
@@ -216,13 +236,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
           }
           //print("Session time left: $sessionTime");
-          if (hard > 90) {
-            hard = hard - 10;
+          if (hard < 130 && flag==0) {
+            hard = hard + 10;
             print(hard);
           }
+          else if (hard == 130){
+            hard = 90;
+            flag=1;
+          }
+          scheduleList.sort((a, b) => b[0].compareTo(a[0]));
 
         }
-        while(sessionTime<90&&sessionTime>=30){
+        while(sessionTime<=90&&sessionTime>=30){
           sessionTime = sessionTime-30;
           rounds++;
           setState(() {
@@ -360,119 +385,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
 
-            // Column(
-            //   crossAxisAlignment: CrossAxisAlignment.start,
-            //   children: [
-            //     SliderTheme(
-            //       data: SliderTheme.of(context).copyWith(
-            //         trackHeight: 10.0,
-            //         trackShape: RoundedRectSliderTrackShape(),
-            //         activeTrackColor: Colors.purple.shade800,
-            //         inactiveTrackColor: Colors.purple.shade100,
-            //         thumbShape: RoundSliderThumbShape(
-            //           enabledThumbRadius: 14.0,
-            //           pressedElevation: 8.0,
-            //         ),
-            //         thumbColor: Colors.pinkAccent,
-            //         overlayColor: Colors.pink.withOpacity(0.2),
-            //         overlayShape: RoundSliderOverlayShape(overlayRadius: 32.0),
-            //         tickMarkShape: RoundSliderTickMarkShape(),
-            //         activeTickMarkColor: Colors.pinkAccent,
-            //         inactiveTickMarkColor: Colors.white,
-            //         valueIndicatorShape: PaddleSliderValueIndicatorShape(),
-            //         valueIndicatorColor: Colors.black,
-            //         valueIndicatorTextStyle: TextStyle(
-            //           color: Colors.white,
-            //           fontSize: 20.0,
-            //         ),
-            //       ),
-            //       child: Slider(
-            //         min: 90,
-            //         max: 1000,
-            //         value: _value.toDouble(),
-            //         divisions: 910,
-            //         label: '${_value.round()}',
-            //         onChanged: (value) {
-            //           setState(() {
-            //             _value = value.round();
-            //             //print(_value);
-            //             int rounds = 0;
-            //             int flag = 0;
-            //             int hard = 130;
-            //             int sessionTime = value.round();
-            //             scheduleList.clear();
-            //             while (sessionTime >= 90) {
-            //               if (sessionTime - hard >= 0) {
-            //                 print(hard);
-            //                 sessionTime = sessionTime - hard;
-            //                 rounds++;
-            //                 setState(() {
-            //                   scheduleList.add([hard-40,10,25,5]);
-            //                   //scheduleList.add([0,0,0,0]);
-            //                   _rounds = rounds;
-            //                 });
-            //
-            //               }
-            //               print("Session time left: $sessionTime");
-            //               if (hard > 90) {
-            //                 hard = hard - 10;
-            //                 print(hard);
-            //               }
-            //
-            //             }
-            //             print(scheduleList);
-            //
-            //           });
-            //         },
-            //       ),
-            //     )
-            //   ],
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-            //   child: TextFormField(
-            //     keyboardType: TextInputType.number,
-            //     decoration: const InputDecoration(
-            //       border: OutlineInputBorder(),
-            //       hintText: 'Enter session time',
-            //     ),
-            //     // The validator receives the text that the user has entered.
-            //     validator: (value) {
-            //       if (value == null || value.isEmpty) {
-            //         return 'Please enter some text';
-            //       }
-            //       return null;
-            //     },
-            //     onChanged: (value) {
-            //       int rounds = 0;
-            //       int flag = 0;
-            //       int hard = 130;
-            //       int sessionTime = int.parse(value);
-            //       scheduleList.clear();
-            //       while (sessionTime >= 90) {
-            //         if (sessionTime - hard >= 0) {
-            //           print(hard);
-            //           sessionTime = sessionTime - hard;
-            //           rounds++;
-            //           setState(() {
-            //             scheduleList.add([hard-40,10,25,5]);
-            //             //scheduleList.add([0,0,0,0]);
-            //             _rounds = rounds;
-            //           });
-            //
-            //         }
-            //         print("Session time left: $sessionTime");
-            //         if (hard > 90) {
-            //           hard = hard - 10;
-            //           print(hard);
-            //         }
-            //
-            //       }
-            //       print(scheduleList);
-            //
-            //     },
-            //   ),
-            // ),
+
         Visibility(
           visible:(_rounds>0)?true:false,
           child: Expanded(
