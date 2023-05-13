@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _value = 300;
   String _status = 'idle';
   Color _statusColor = Colors.amber;
-  TimeOfDay _time = TimeOfDay(hour: 3, minute: 10);
+  TimeOfDay _time = TimeOfDay(hour: 1, minute: 30);
 
   @override
   void initState() {
@@ -53,17 +53,18 @@ class _MyHomePageState extends State<MyHomePage> {
       print(differenceIntime);
       if(int.parse(minutes)>=differenceIntime){
         _minutes = int.parse(minutes)-differenceIntime;
-        if(alarms[0].split('@')[2]=='running') {
-          _resumeTimer();
-          //alarms.removeAt(0);
-        }
-        else if(alarms[0].split('@')[2]=='pause'){
-          _pauseTimer();
-          //alarms.removeAt(0);
-        }
+
       }
       else{
         _minutes = 0;
+      }
+      if(alarms[0].split('@')[2]=='running') {
+        _resumeTimer();
+        //alarms.removeAt(0);
+      }
+      else if(alarms[0].split('@')[2]=='pause'){
+        _pauseTimer();
+        //alarms.removeAt(0);
       }
 
     });
@@ -80,9 +81,11 @@ class _MyHomePageState extends State<MyHomePage> {
     alarms[0] = alarms[0]+'@'+DateTime.now().toString()+'@running';
     sharedPreference.setStringList("list",alarms);
     _seconds = 0;
-    alarms.removeAt(0);
-
     setState(() {
+      while(alarms[0].contains('@')){
+        print("runninStart");
+        alarms.removeAt(0);
+      }
       _visibleTime=false;
       _isRunning = true;
     });
@@ -112,16 +115,29 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
   void _resumeTimer() {
-
+  if(_minutes>0){
     alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@running');
     sharedPreference.setStringList("list",alarms);
+    setState(() {
+      while(alarms[0].contains('@')){
+        print("running pause");
+        alarms.removeAt(0);
+        print(alarms);
+      }
+      alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@running');
+      sharedPreference.setStringList("list",alarms);
+      alarms.removeAt(0);
+      print(alarms);
+    });
+  }
+
+  setState(() {
     while(alarms[0].contains('@')){
       alarms.removeAt(0);
     }
-    setState(() {
-      _visibleTime=false;
-      _isRunning = true;
-    });
+    _visibleTime=false;
+    _isRunning = true;
+  });
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (_seconds > 0) {
@@ -157,13 +173,14 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@pause');
     sharedPreference.setStringList("list",alarms);
-    if(alarms[0].contains('@')){
-      alarms.removeAt(0);
-    }
+
 
 
 
     setState(() {
+      if(alarms[0].contains('@')){
+        alarms.removeAt(0);
+      }
       _isRunning = false;
       _isPause = true;
     });
@@ -234,8 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
             sessionTime = sessionTime - hard;
             rounds++;
             setState(() {
-              scheduleList.add([hard-40,10,25,5]);
-              //scheduleList.add([0,0,0,0]);
+             scheduleList.add([hard-40,10,25,5]);
+              //scheduleList.add([2,2,2,2]);
               _rounds = rounds;
             });
 
@@ -248,7 +265,7 @@ class _MyHomePageState extends State<MyHomePage> {
             rounds++;
             setState(() {
               scheduleList.add([hard-40,10,25,5]);
-              //scheduleList.add([0,0,0,0]);
+              //scheduleList.add([2,2,2,2]);
               _rounds = rounds;
             });
           }
