@@ -111,6 +111,12 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
   void _resumeTimer() {
+
+    alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@running');
+    sharedPreference.setStringList("list",alarms);
+    while(alarms[0].contains('@')){
+      alarms.removeAt(0);
+    }
     setState(() {
       _visibleTime=false;
       _isRunning = true;
