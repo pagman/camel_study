@@ -264,13 +264,21 @@ class _MyHomePageState extends State<MyHomePage> {
           });
         }
         else if(sessionTime<25&&sessionTime>0){
-          rounds++;
-          setState(() {
-            scheduleList.add([sessionTime]);
-            //scheduleList.add([0,0,0,0]);
-            _rounds = rounds;
-          });
-          sessionTime=0;
+          print("Session time before: $sessionTime and rounds $rounds");
+          int timeToAdd = (sessionTime/rounds).round();
+          for(int i=0;i<=rounds-1;i++){
+            if(sessionTime - timeToAdd<0){
+              break;
+            }
+            scheduleList[i][0] = scheduleList[i][0]+ timeToAdd;
+            sessionTime = sessionTime -timeToAdd;
+          }
+          // setState(() {
+          //   scheduleList.add([sessionTime]);
+          //   //scheduleList.add([0,0,0,0]);
+          //   _rounds = rounds;
+          // });
+          //sessionTime=0;
         }
         print("Session time left: $sessionTime");
         //print(scheduleList);
