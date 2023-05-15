@@ -245,7 +245,7 @@ class _MyHomePageState extends State<MyHomePage> {
         int hard = 90;
         int sessionTime = newTime.hour*60+newTime.minute%60;
         scheduleList.clear();
-        while (sessionTime >= 130) {
+        while (sessionTime >= 90) {
           if (sessionTime - hard >= 0) {
             print(hard);
             sessionTime = sessionTime - hard;
