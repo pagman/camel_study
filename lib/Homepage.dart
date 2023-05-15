@@ -63,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
         //alarms.removeAt(0);
       }
       else if(alarms[0].split('@')[2]=='pause'){
+        _minutes = int.parse(minutes);
         _pauseTimer();
         //alarms.removeAt(0);
       }
@@ -347,7 +348,8 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 50,
               child: Center(
                 child: Text(
-                  (alarms.length/2==0)?'Break':"Study",
+                    //((alarms.length%2).toString()),
+                  (alarms.length%2==0)?'Study':"Break",
                   style: const TextStyle(
                       fontSize: 20,color: Color(0xffA0D8B3)),
 
