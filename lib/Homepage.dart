@@ -260,14 +260,14 @@ class _MyHomePageState extends State<MyHomePage> {
           //print("Session time left: $sessionTime");
           if (hard < 130 && flag==0) {
             hard = hard + 10;
-            print(hard);
-            sessionTime = sessionTime - hard;
-            rounds++;
-            setState(() {
-              scheduleList.add([hard-40,10,25,5]);
-              //scheduleList.add([2,2,2,2]);
-              _rounds = rounds;
-            });
+            // print(hard);
+            // sessionTime = sessionTime - hard;
+            // rounds++;
+            // setState(() {
+            //   scheduleList.add([hard-40,10,25,5]);
+            //   //scheduleList.add([2,2,2,2]);
+            //   _rounds = rounds;
+            // });
           }
           else if (hard == 130){
             hard = 90;
