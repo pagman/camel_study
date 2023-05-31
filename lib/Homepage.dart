@@ -13,7 +13,7 @@ class MyHomePage extends StatefulWidget {
 
 final _formKey = GlobalKey<FormState>();
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   int _rounds = 0;
   List<List<int>> scheduleList = [[]];
   int _seconds = 0;
@@ -36,6 +36,21 @@ class _MyHomePageState extends State<MyHomePage> {
     loadSharedPreferences();
     alarms.clear();
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if(state == AppLifecycleState.resumed){
+      // user returned to our app
+      loadSharedPreferences();
+    }
   }
 
   loadSharedPreferences() async {
