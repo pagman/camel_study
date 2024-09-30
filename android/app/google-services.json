@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "554510570755",
+    "project_id": "camel-study",
+    "storage_bucket": "camel-study.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:554510570755:android:343f230ea076f56d9fc536",
+        "android_client_info": {
+          "package_name": "com.example.camel_study"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "554510570755-vn0jlrm7k51atb0odlqknfobm6lhfrm2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQRvqdOriu1YeNBBUa68uadU_CRe2yMbg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "554510570755-vn0jlrm7k51atb0odlqknfobm6lhfrm2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -233,14 +233,14 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               child:
           Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: Color(0xffA0D8B3), // <-- SEE HERE
               onPrimary: Color(0xffA2A378), // <-- SEE HERE
               onSurface: Color(0xff83764F), // <-- SEE HERE
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                primary: Color(0xffA2A378), // button text color
+                foregroundColor: Color(0xffA2A378), // button text color
               ),
             ),
           ),
