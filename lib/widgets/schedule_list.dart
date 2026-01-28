@@ -26,7 +26,7 @@ class ScheduleList extends StatelessWidget {
           itemCount: scheduleList.length,
           itemBuilder: (context, index) {
             return Card(
-              color: AppTheme.grayDark,
+              color: AppTheme.grayDark.withOpacity(0.7),
               child: ListTile(
                 title: Text(
                   scheduleList[index].join(" "),

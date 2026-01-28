@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'theme/app_theme.dart';
@@ -64,28 +65,35 @@ class _MyHomePageState extends State<MyHomePage>
   Future<void> loadSharedPreferences() async {
     sharedPreference = await SharedPreferences.getInstance();
     List<String> listString = sharedPreference.getStringList('list') ?? [];
+    String? scheduleString = sharedPreference.getString('scheduleList');
 
     if (listString.isEmpty) return;
 
-    setState(() {
-      alarms = listString;
-      String minutes = alarms[0].split('@')[0];
-      DateTime timerStarted = DateTime.parse(alarms[0].split('@')[1]);
-      int differenceInTime = DateTime.now().difference(timerStarted).inMinutes;
+    // Load the schedule list
+    if (scheduleString != null) {
+      List<dynamic> decoded = jsonDecode(scheduleString);
+      scheduleList = decoded.map((e) => List<int>.from(e)).toList();
+      _rounds = scheduleList.length;
+    }
 
-      if (int.parse(minutes) >= differenceInTime) {
-        _minutes = int.parse(minutes) - differenceInTime;
-      } else {
-        _minutes = 0;
-      }
+    alarms = listString;
+    String minutes = alarms[0].split('@')[0];
+    DateTime timerStarted = DateTime.parse(alarms[0].split('@')[1]);
+    int differenceInTime = DateTime.now().difference(timerStarted).inMinutes;
+    String status = alarms[0].split('@')[2];
 
-      if (alarms[0].split('@')[2] == 'running') {
-        _resumeTimer();
-      } else if (alarms[0].split('@')[2] == 'pause') {
-        _minutes = int.parse(minutes);
-        _pauseTimer();
-      }
-    });
+    if (int.parse(minutes) >= differenceInTime) {
+      _minutes = int.parse(minutes) - differenceInTime;
+    } else {
+      _minutes = 0;
+    }
+
+    if (status == 'running') {
+      _resumeTimer();
+    } else if (status == 'pause') {
+      _minutes = int.parse(minutes);
+      _pauseTimer();
+    }
   }
 
   // Timer Methods
@@ -99,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage>
     _minutes = int.parse(alarms.first);
     alarms.insert(0, '${alarms[0]}@${DateTime.now()}@running');
     sharedPreference.setStringList("list", alarms);
+    sharedPreference.setString("scheduleList", jsonEncode(scheduleList));
     _seconds = 0;
 
     setState(() {
@@ -193,7 +202,11 @@ class _MyHomePageState extends State<MyHomePage>
       _isRunning = false;
       _isPause = false;
       _runOut = false;
+      _rounds = 0;
+      scheduleList = [[]];
     });
+    sharedPreference.remove('list');
+    sharedPreference.remove('scheduleList');
     clearBubbles();
     _timer?.cancel();
   }
