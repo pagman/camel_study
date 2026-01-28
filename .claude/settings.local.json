@@ -5,7 +5,20 @@
       "Bash(powershell -Command:*)",
       "Bash(dir \"C:\\\\flutterProjects\\\\ camel_study\\\\build\")",
       "Bash(flutter analyze:*)",
-      "Bash(flutter pub get:*)"
+      "Bash(flutter pub get:*)",
+      "Bash(flutter devices:*)",
+      "Bash(flutter drive:*)",
+      "Bash(adb devices:*)",
+      "Bash(C:\\\\Users\\\\manta\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe devices)",
+      "Bash(\"/mnt/c/Users/manta/AppData/Local/Android/Sdk/platform-tools/adb.exe\" devices)",
+      "Bash(cmd.exe:*)",
+      "Bash(flutter run:*)",
+      "Bash(flutter install:*)",
+      "Bash(flutter clean:*)",
+      "Bash(dir \"C:\\\\flutterProjects\\\\camel_study\\\\screenshots\")",
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(python:*)"
     ]
   }
 }
