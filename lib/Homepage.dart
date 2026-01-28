@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'theme/app_theme.dart';
+import 'widgets/bubble_layer.dart';
+import 'widgets/timer_display.dart';
+import 'widgets/timer_controls.dart';
+import 'widgets/schedule_list.dart';
+import 'controllers/bubble_controller.dart';
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
@@ -13,7 +20,9 @@ class MyHomePage extends StatefulWidget {
 
 final _formKey = GlobalKey<FormState>();
 
-class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+class _MyHomePageState extends State<MyHomePage>
+    with WidgetsBindingObserver, TickerProviderStateMixin, BubbleController {
+  // Timer state
   int _rounds = 0;
   List<List<int>> scheduleList = [[]];
   int _seconds = 0;
@@ -26,66 +35,60 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _runOut = false;
   bool _visibleTime = true;
   Timer? _timer;
-  int _value = 300;
-  String _status = 'idle';
-  Color _statusColor = Colors.amber;
-  TimeOfDay _time = TimeOfDay(hour: 1, minute: 30);
+  TimeOfDay _time = const TimeOfDay(hour: 1, minute: 30);
 
   @override
   void initState() {
+    super.initState();
     loadSharedPreferences();
     alarms.clear();
-    super.initState();
     WidgetsBinding.instance.addObserver(this);
+    initBubbleController();
   }
 
   @override
   void dispose() {
+    disposeBubbleController();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if(state == AppLifecycleState.resumed){
-      // user returned to our app
+    if (state == AppLifecycleState.resumed) {
       loadSharedPreferences();
     }
   }
 
-  loadSharedPreferences() async {
+  // Shared Preferences
+  Future<void> loadSharedPreferences() async {
     sharedPreference = await SharedPreferences.getInstance();
-    List<String> listString = sharedPreference.getStringList('list')??[];
-    print("loaded");
+    List<String> listString = sharedPreference.getStringList('list') ?? [];
+
+    if (listString.isEmpty) return;
+
     setState(() {
-      print(listString);
       alarms = listString;
       String minutes = alarms[0].split('@')[0];
       DateTime timerStarted = DateTime.parse(alarms[0].split('@')[1]);
-      print(timerStarted);
-      print(DateTime.now());
-      int differenceIntime = DateTime.now().difference(timerStarted).inMinutes;
-      print(differenceIntime);
-      if(int.parse(minutes)>=differenceIntime){
-        _minutes = int.parse(minutes)-differenceIntime;
+      int differenceInTime = DateTime.now().difference(timerStarted).inMinutes;
 
-      }
-      else{
+      if (int.parse(minutes) >= differenceInTime) {
+        _minutes = int.parse(minutes) - differenceInTime;
+      } else {
         _minutes = 0;
       }
-      if(alarms[0].split('@')[2]=='running') {
+
+      if (alarms[0].split('@')[2] == 'running') {
         _resumeTimer();
-        //alarms.removeAt(0);
-      }
-      else if(alarms[0].split('@')[2]=='pause'){
+      } else if (alarms[0].split('@')[2] == 'pause') {
         _minutes = int.parse(minutes);
         _pauseTimer();
-        //alarms.removeAt(0);
       }
-
     });
   }
 
+  // Timer Methods
   void _startTimer() {
     for (int i = 0; i <= scheduleList.length - 1; i++) {
       for (int j = 0; j <= scheduleList[i].length - 1; j++) {
@@ -94,66 +97,49 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
 
     _minutes = int.parse(alarms.first);
-    alarms.insert(0, alarms[0]+'@'+DateTime.now().toString()+'@running');
-    sharedPreference.setStringList("list",alarms);
+    alarms.insert(0, '${alarms[0]}@${DateTime.now()}@running');
+    sharedPreference.setStringList("list", alarms);
     _seconds = 0;
+
     setState(() {
-      while(alarms[0].contains('@')){
-        print("runninStart");
+      while (alarms[0].contains('@')) {
         alarms.removeAt(0);
       }
-      _visibleTime=false;
+      _visibleTime = false;
       _isRunning = true;
     });
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_seconds > 0) {
-          _seconds--;
-        } else {
-          if (_minutes > 0) {
-            _minutes--;
-            _seconds = 59;
-          } else {
-            if (_hours > 0) {
-              _hours--;
-              _minutes = 59;
-              _seconds = 59;
-            } else {
-              print("run out1");
-              _isRunning = false;
-              _isPause = true;
-              _runOut = true;
-              _timer?.cancel();
-            }
-          }
-        }
-      });
-    });
+
+    startBubbleAnimation(_hours, _minutes, _seconds, () => _isRunning);
+    _startCountdown();
   }
+
   void _resumeTimer() {
-  if(_minutes>0){
-    alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@running');
-    sharedPreference.setStringList("list",alarms);
-    setState(() {
-      while(alarms[0].contains('@')){
-        print("running pause");
+    if (_minutes > 0) {
+      alarms.insert(0, '$_minutes@${DateTime.now()}@running');
+      sharedPreference.setStringList("list", alarms);
+      setState(() {
+        while (alarms[0].contains('@')) {
+          alarms.removeAt(0);
+        }
+        alarms.insert(0, '$_minutes@${DateTime.now()}@running');
+        sharedPreference.setStringList("list", alarms);
         alarms.removeAt(0);
-        print(alarms);
+      });
+    }
+
+    setState(() {
+      while (alarms[0].contains('@')) {
+        alarms.removeAt(0);
       }
-      alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@running');
-      sharedPreference.setStringList("list",alarms);
-      alarms.removeAt(0);
-      print(alarms);
+      _visibleTime = false;
+      _isRunning = true;
     });
+
+    startBubbleAnimation(_hours, _minutes, _seconds, () => _isRunning);
+    _startCountdown();
   }
 
-  setState(() {
-    while(alarms[0].contains('@')){
-      alarms.removeAt(0);
-    }
-    _visibleTime=false;
-    _isRunning = true;
-  });
+  void _startCountdown() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         if (_seconds > 0) {
@@ -168,10 +154,10 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               _minutes = 59;
               _seconds = 59;
             } else {
-              print("run out2");
               _isRunning = false;
               _isPause = true;
               _runOut = true;
+              stopBubbleAnimation();
               _timer?.cancel();
             }
           }
@@ -180,285 +166,178 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     });
   }
 
-  // This function will be called when the user presses the pause button
-  // Pause the timer
   void _pauseTimer() {
-    while(alarms[0].contains('@')){
+    while (alarms[0].contains('@')) {
       alarms.removeAt(0);
-      //alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@pause');
     }
-    alarms.insert(0, _minutes.toString()+'@'+DateTime.now().toString()+'@pause');
-    sharedPreference.setStringList("list",alarms);
-
-
-
+    alarms.insert(0, '$_minutes@${DateTime.now()}@pause');
+    sharedPreference.setStringList("list", alarms);
 
     setState(() {
-      if(alarms[0].contains('@')){
+      if (alarms[0].contains('@')) {
         alarms.removeAt(0);
       }
       _isRunning = false;
       _isPause = true;
     });
+    stopBubbleAnimation();
     _timer?.cancel();
   }
 
-  // This function will be called when the user presses the cancel button
-  // Cancel the timer
   void _cancelTimer() {
     setState(() {
-      _visibleTime=true;
+      _visibleTime = true;
       _hours = 0;
       _minutes = 0;
       _seconds = 0;
       _isRunning = false;
       _isPause = false;
-      _isPause = false;
       _runOut = false;
     });
+    clearBubbles();
     _timer?.cancel();
   }
 
-  void _selectTime() async {
+  void _handleStartPause() {
+    setState(() {
+      _visibleTime = false;
+    });
+
+    if (_isRunning) {
+      _pauseTimer();
+    } else if (_isPause && !_runOut) {
+      _resumeTimer();
+    } else if (_runOut) {
+      alarms.removeAt(0);
+      setState(() {
+        _minutes = int.parse(alarms[0]);
+      });
+      _runOut = false;
+      _resumeTimer();
+    } else {
+      alarms.clear();
+      _startTimer();
+    }
+  }
+
+  // Time Selection
+  Future<void> _selectTime() async {
     final TimeOfDay? newTime = await showTimePicker(
       context: context,
       builder: (context, childWidget) {
-
-        return
-          MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                // Using 24-Hour format
-                  alwaysUse24HourFormat: true),
-              // If you want 12-Hour format, just change alwaysUse24HourFormat to false or remove all the builder argument
-              child:
-          Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Color(0xffA0D8B3), // <-- SEE HERE
-              onPrimary: Color(0xffA2A378), // <-- SEE HERE
-              onSurface: Color(0xff83764F), // <-- SEE HERE
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: Color(0xffA2A378), // button text color
-              ),
-            ),
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          child: Theme(
+            data: AppTheme.timePickerTheme(context),
+            child: childWidget!,
           ),
-
-          child: childWidget!,
-        ));
+        );
       },
       initialTime: _time,
     );
+
     if (newTime != null) {
-      print(newTime.hour*60+newTime.minute%60);
       setState(() {
         _time = newTime;
-        _value = newTime.hour*60+newTime.minute%60;
-        //print(_value);
-        int rounds = 0;
-        int flag = 0;
-        int hard = 90;
-        int sessionTime = newTime.hour*60+newTime.minute%60;
-        scheduleList.clear();
-        while (sessionTime >= 90) {
-          if (sessionTime - hard >= 0) {
-            print(hard);
-            sessionTime = sessionTime - hard;
-            rounds++;
-            setState(() {
-             scheduleList.add([hard-40,10,25,5]);
-              //scheduleList.add([2,2,2,2]);
-              _rounds = rounds;
-            });
-
-          }
-          //print("Session time left: $sessionTime");
-          if (hard < 130 && flag==0) {
-            hard = hard + 10;
-            // print(hard);
-            // sessionTime = sessionTime - hard;
-            // rounds++;
-            // setState(() {
-            //   scheduleList.add([hard-40,10,25,5]);
-            //   //scheduleList.add([2,2,2,2]);
-            //   _rounds = rounds;
-            // });
-          }
-          else if (hard == 130){
-            hard = 90;
-            flag=1;
-          }
-          scheduleList.sort((a, b) => b[0].compareTo(a[0]));
-
-        }
-        while(sessionTime<=90&&sessionTime>=30){
-          sessionTime = sessionTime-30;
-          rounds++;
-          setState(() {
-            scheduleList.add([25,5]);
-            //scheduleList.add([0,0,0,0]);
-            _rounds = rounds;
-          });
-        }
-        if(sessionTime>=25&&sessionTime<30){
-          sessionTime = sessionTime-25;
-          rounds++;
-          setState(() {
-            scheduleList.add([25]);
-            //scheduleList.add([0,0,0,0]);
-            _rounds = rounds;
-          });
-        }
-        else if(sessionTime<25&&sessionTime>0){
-          print("Session time before: $sessionTime and rounds $rounds");
-          int timeToAdd = (sessionTime/rounds).round();
-          for(int i=0;i<=rounds-1;i++){
-            if(sessionTime - timeToAdd<0){
-              break;
-            }
-            scheduleList[i][0] = scheduleList[i][0]+ timeToAdd;
-            sessionTime = sessionTime -timeToAdd;
-          }
-          // setState(() {
-          //   scheduleList.add([sessionTime]);
-          //   //scheduleList.add([0,0,0,0]);
-          //   _rounds = rounds;
-          // });
-          //sessionTime=0;
-        }
-        print("Session time left: $sessionTime");
-        //print(scheduleList);
+        _calculateSchedule(newTime);
       });
     }
   }
 
+  void _calculateSchedule(TimeOfDay time) {
+    int rounds = 0;
+    int flag = 0;
+    int hard = 90;
+    int sessionTime = time.hour * 60 + time.minute % 60;
+    scheduleList.clear();
+
+    while (sessionTime >= 90) {
+      if (sessionTime - hard >= 0) {
+        sessionTime = sessionTime - hard;
+        rounds++;
+        scheduleList.add([hard - 40, 10, 25, 5]);
+        _rounds = rounds;
+      }
+      if (hard < 130 && flag == 0) {
+        hard = hard + 10;
+      } else if (hard == 130) {
+        hard = 90;
+        flag = 1;
+      }
+      scheduleList.sort((a, b) => b[0].compareTo(a[0]));
+    }
+
+    while (sessionTime <= 90 && sessionTime >= 30) {
+      sessionTime = sessionTime - 30;
+      rounds++;
+      scheduleList.add([25, 5]);
+      _rounds = rounds;
+    }
+
+    if (sessionTime >= 25 && sessionTime < 30) {
+      sessionTime = sessionTime - 25;
+      rounds++;
+      scheduleList.add([25]);
+      _rounds = rounds;
+    } else if (sessionTime < 25 && sessionTime > 0) {
+      int timeToAdd = (sessionTime / rounds).round();
+      for (int i = 0; i <= rounds - 1; i++) {
+        if (sessionTime - timeToAdd < 0) {
+          break;
+        }
+        scheduleList[i][0] = scheduleList[i][0] + timeToAdd;
+        sessionTime = sessionTime - timeToAdd;
+      }
+    }
+  }
+
+  String get _statusText => (alarms.length % 2 == 0) ? 'Study' : 'Break';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: _formKey,
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Color(0xffA0D8B3),
-        title: Text(widget.title),
+        backgroundColor: AppTheme.primaryColor,
+        title: Text(widget.title, style: const TextStyle(color: Colors.white)),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              width: double.infinity,
-              height: 200,
-              child: Center(
-                child: Text(
-                  '${_minutes.toString().padLeft(2, '0')}:${_seconds.toString().padLeft(2, '0')}',
-                  style: const TextStyle(
-                      fontSize: 60, fontWeight: FontWeight.bold,color: Color(0xffA0D8B3)),
-
-                ),
-              ),
-            ),
-            Container(
-              width: double.infinity,
-              height: 50,
-              child: Center(
-                child: Text(
-                    //((alarms.length%2).toString()),
-                  (alarms.length%2==0)?'Study':"Break",
-                  style: const TextStyle(
-                      fontSize: 20,color: Color(0xffA0D8B3)),
-
-                ),
-              ),
-            ),
-            Center(
-              child:
-              Text(alarms.join(" "),
-                  style: TextStyle(color: Color(0xffA0D8B3)),),
-            ),
-            // The 3 sliders to set hours, minutes and seconds
-
-            // The start/pause and cancel buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: Stack(
+        children: [
+          BubbleLayer(bubbles: bubbles),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                // The start/pause button
-                // The text on the button changes based on the state (_isRunning)
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _visibleTime=false;
-                    });
-                    if (_isRunning) {
-                      _pauseTimer();
-                    }
-                    else if(_isPause && !_runOut){
-                      _resumeTimer();
-                    }
-                    else if(_runOut && _runOut){
-                      print("on resume run out button");
-                      alarms.removeAt(0);
-                      setState(() {
-                        _minutes = int.parse(alarms[0]);
-                      });
-                      _runOut = false;
-                      _resumeTimer();
-                    }
-                      else {
-                      alarms.clear();
-                      _startTimer();
-                    }
-                  },
-                  style:
-                  ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xffA0D8B3),
-                      fixedSize: const Size(150, 40)),
-                  child: _isRunning? const Text('Pause') :(!_isRunning && _isPause)? const Text('Resume'):const Text('Start'),
+                TimerDisplay(
+                  minutes: _minutes,
+                  seconds: _seconds,
+                  status: _statusText,
                 ),
-                // The cancel button
-                ElevatedButton(
-                  onPressed: _cancelTimer,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xffA2A378),
-                      fixedSize: const Size(150, 40)),
-                  child: const Text('Cancel'),
+                Center(
+                  child: Text(
+                    alarms.join(" "),
+                    style: AppTheme.subtitleStyle,
+                  ),
+                ),
+                TimerControls(
+                  isRunning: _isRunning,
+                  isPause: _isPause,
+                  visibleTime: _visibleTime,
+                  onStartPause: _handleStartPause,
+                  onCancel: _cancelTimer,
+                  onSelectTime: _selectTime,
+                ),
+                const SizedBox(height: 16),
+                ScheduleList(
+                  scheduleList: scheduleList,
+                  visible: _rounds > 0,
                 ),
               ],
             ),
-            Center(
-              child:
-              Visibility(
-                visible: _visibleTime,
-                child: ElevatedButton(
-                  onPressed: _selectTime,
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xff83764F),
-                      fixedSize: const Size(150, 40)),
-                  child: const Text('Select time'),
-                ),
-              ),
-            ),
-
-
-        Visibility(
-          visible:(_rounds>0)?true:false,
-          child: Expanded(
-            child: ListView.builder(
-                itemCount: scheduleList.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                      child: ListTile(
-                          title: Text(scheduleList[index].join(" ")),
-                          subtitle: Text((scheduleList[index].length==4)?"Hard Break Easy Break":(scheduleList[index].length==2)?"Easy Break":"Easy"),
-                          trailing: Icon(Icons.timer)));
-                }),
           ),
-        ),
-
-          ],
-        ),
+        ],
       ),
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

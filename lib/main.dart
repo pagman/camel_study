@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Camel Study technique',
+      debugShowCheckedModeBanner: false,
       home:  MyHomePage(title: 'Camel study by Vanya'),
     );
   }

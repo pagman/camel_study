@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter build:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(dir \"C:\\\\flutterProjects\\\\ camel_study\\\\build\")",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter pub get:*)"
+    ]
+  }
+}
